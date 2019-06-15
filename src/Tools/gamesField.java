@@ -32,6 +32,7 @@ public class gamesField extends JFrame{
     JPanel panelCurrentGames = new JPanel();
     JPanel panelStartGames = new JPanel();
 
+    // add me please
     /*
     java.util.Timer timerForShot = new java.util.Timer();
     TimerTask timerTaskForShot = new TimerTask() {
