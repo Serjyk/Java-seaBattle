@@ -50,6 +50,8 @@ public class battleField extends JPanel{
 
 
     private gamesField myparent = null;
+
+    private int getCountAliveShip = 0;
     //private HashMap<Pair<Integer, Integer>, JButton> mapPositiontButton = new HashMap<>();
 
 
@@ -130,17 +132,37 @@ public class battleField extends JPanel{
         panelBoxes.setLayout(new GridLayout(11,11,0,0));
         this.add(panelBoxes);
 
-        panelBoxes.add( new JLabel() );
+        JLabel firstBoxText = new JLabel("");
+        JPanel firstBox = new JPanel();
+        firstBox.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+        firstBox.add(firstBoxText);
+
+        panelBoxes.add( firstBox );
 
         // Заполняем поле кнопками
         String headTop = "ABCDEFGHIJ";
         for (int i = 0; i < 10; i++)
         {
-            panelBoxes.add( new JLabel(Character.toString(headTop.charAt(i))) );
+            JLabel labelLett = new JLabel(Character.toString(headTop.charAt(i)));
+            //labelLett.setForeground( typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+
+            JPanel titlePanel = new JPanel();
+            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+            titlePanel.add(labelLett);
+
+            panelBoxes.add( titlePanel );
         }
 
         for(int i = 0; i < 10; i++) {
-            panelBoxes.add( new JLabel(Integer.toString( i + 1)) );
+            JLabel labelNum = new JLabel(Integer.toString( i + 1));
+            //labelNum.setForeground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+
+            JPanel titlePanel = new JPanel();
+            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+            titlePanel.add(labelNum);
+
+            panelBoxes.add( titlePanel );
+
             for (int j = 0; j < 10; j++) {
 
                 buttonsMatrix[i][j] = new JButton("");
@@ -170,6 +192,9 @@ public class battleField extends JPanel{
         add(labelNameField, constraints);
 
         JLabel labeltest1 = new JLabel("Тестовое");
+        //labeltest1.setForeground( Color.green );
+        //labeltest1.setBackground( Color.green );
+
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;      // первая ячейка таблицы по горизонтали
         add(labeltest1, constraints);
@@ -202,7 +227,8 @@ public class battleField extends JPanel{
                     switch (battleMatrix[i][j]) {
                         case E_EMPTY: colorBut = Color.lightGray ; break;
                         case E_CHECKED_EMPTY: colorBut = Color.blue ; break;
-                        case E_SHIP: colorBut = Color.lightGray ; break;
+                        //case E_SHIP: colorBut = Color.lightGray ; break;
+                        case E_SHIP: colorBut = Color.black ; break;
                         case E_DESTROYED_SHIP: colorBut = Color.pink ; break;
                     }
                     //buttonsMatrix[i][j].setText(nameBox);
@@ -244,20 +270,47 @@ public class battleField extends JPanel{
     public void setShipInBox(int row, int column) {
         battleMatrix[row][column] = stateBox.E_SHIP;
         updateStateField();
+        getCountAliveShip++;
+    }
+
+    public stateBox getStateBox(int row, int column) {
+        return battleMatrix[row][column];
     }
 
     public void setShotInBox(int row, int column) {
-        if(battleMatrix[row][column] == stateBox.E_EMPTY )
+        if(battleMatrix[row][column] == stateBox.E_EMPTY ) {
             battleMatrix[row][column] = stateBox.E_CHECKED_EMPTY;
-        else if(battleMatrix[row][column] == stateBox.E_SHIP)
+        }
+        else if(battleMatrix[row][column] == stateBox.E_SHIP) {
             battleMatrix[row][column] = stateBox.E_DESTROYED_SHIP;
+            getCountAliveShip--;
+        }
 
         myparent.haveShot( typeThisField );
         updateStateField();
     }
 
+    public int getCountAliveShip() {
+        return getCountAliveShip;
+    }
+
+    public typeField getTypeThisField() {
+        return typeThisField;
+    }
+
     public void setStateField(stateField state ) {
         stateThisField = state;
+    }
+
+    public void clearField() {
+        for(int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                battleMatrix[i][j] = stateBox.E_EMPTY;
+            }
+        }
+
+        getCountAliveShip = 0;
+        updateStateField();
     }
 
 
@@ -284,6 +337,7 @@ public class battleField extends JPanel{
             }
             else if(stateThisField == stateField.E_WAIT_SET_SHIP) {
                 setShipInBox(row,column );
+
             }
             else if(stateThisField == stateField.E_TAKE_SHOT) {
                 myparent.haveShot( typeThisField );
