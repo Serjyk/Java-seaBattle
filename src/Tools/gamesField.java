@@ -2,19 +2,21 @@ package Tools;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Queue;
-import java.util.TimerTask;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import javax.swing.*;
+import javax.swing.Timer;
 
 import Tools.battleField;
 import com.sun.jmx.remote.internal.ArrayQueue;
 
 public class gamesField extends JFrame{
 
-    private JButton buttonStartGame = new JButton("Start game.");
-    private JButton buttonEndGame = new JButton("End game.");
+    private JButton buttonStartGame = new JButton("Start game");
+    private JButton buttonEndGame = new JButton("End game");
+    private JButton randomSetShips = new JButton("Random Ship");
+    private JButton aboutAutor = new JButton("About");
+    private JButton backOnStartMenu = new JButton("Back");
     private JLabel labelmm = new JLabel("Start game...");
 
     private battleField myField = new battleField( battleField.typeField.E_PLAYER, this );
@@ -27,10 +29,41 @@ public class gamesField extends JFrame{
 
     private JLabel infoLabel = new JLabel("Начни игру");
     private JLabel addInfoLabel = new JLabel("");
+    private JLabel fannyPhraseLabel = new JLabel("");
+    private JLabel allPlayerShotsLabel = new JLabel("");
+    private JLabel currentTimeLabel = new JLabel("");
+
+    private JLabel countPlayerWinLabel = new JLabel("");
+    private JLabel countEnemyWinLabel = new JLabel("");
+
+    String aboutString = "<html>This is sea battle <br> " +
+            "and you need to be careful <br><br> " +
+            "Developer: Sergey Smirnov  ∑<br><br>" +
+            "v.0.2   06.2019<br>" +
+            "<br><br></html>";
+    private JLabel aboutThisGameLabel = new JLabel(aboutString);
+    private JButton aboutBrownBox = new JButton();
+    private JButton aboutRedBox = new JButton();
+    private JButton aboutBlueBox = new JButton();
+
+
+    private int allPlayerShots = 0;
+    long dateTimeStartGame = 0;
+
+    private int countPlayerWin = 0;
+    private int countEnemyWin = 0;
+
+
 
     JPanel panelCenterGame = new JPanel();
     JPanel panelCurrentGames = new JPanel();
     JPanel panelStartGames = new JPanel();
+    JPanel panelAboutGame = new JPanel();
+
+    //JPanel panelStartGames2 = new JPanel();
+
+
+
 
     /*
     java.util.Timer timerForShot = new java.util.Timer();
@@ -49,8 +82,37 @@ public class gamesField extends JFrame{
         }
     });
 
+    Timer TimerForTimeGame = new Timer(1000, new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            long msecCurr = System.currentTimeMillis();
+            currentTimeLabel.setText( "Время игры:   " + Long.toString((msecCurr - dateTimeStartGame)/1000) + " сек");
+
+            /*
+            int ttt = (int)(Math.random()*3);
+            //panelCenterGame.removeAll();
+            if(ttt == 0 ) {
+                //panelCenterGame.add(panelStartGames);
+                panelStartGames.setVisible(true);
+                panelStartGames2.setVisible(false);
+            }
+            else if(ttt == 1) {
+                //panelCenterGame.add(panelAboutGame);
+            } else {
+                //panelCenterGame.add(panelStartGames2);
+                panelStartGames.setVisible(false);
+                panelStartGames2.setVisible(true);
+            }
+*/
+
+        }
+    });
+
     public gamesField() {
         super("Sea Battle");
+        dateTimeStartGame = System.currentTimeMillis();
+        aboutThisGameLabel.setForeground(Color.PINK);
+
 
         this.setBounds(100, 100, 1120, 500);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,24 +130,97 @@ public class gamesField extends JFrame{
 
 
         Container container = this.getContentPane();
+        container.setBackground(new Color(255,255,204));
         //container.setLayout( new GridLayout(3,1,10,10));
         container.setLayout( new FlowLayout(FlowLayout.LEFT, 10, 10));
 
         //panelTools.setVisible(false);
 
         // Создаем панель с настройками, где мы будем видеть время, очки, количество живых кораблей и тд
-        panelCurrentGames.setLayout( new GridLayout(10,1,5,10));
+        panelCurrentGames.setLayout( new GridLayout(10,1,40,10));
+        panelCurrentGames.setBorder( BorderFactory.createEmptyBorder(10, 10, 10, 10) );
         panelCurrentGames.add(infoLabel);
         panelCurrentGames.add(addInfoLabel);
-        panelCurrentGames.add(new JLabel("Время игры"));
-        panelCurrentGames.add(new JLabel("..."));
-        panelCurrentGames.add(new JLabel("Выстрелов"));
-        panelCurrentGames.add(new JLabel("..."));
+        panelCurrentGames.add(new JLabel(""));
+        panelCurrentGames.add(currentTimeLabel);
+        panelCurrentGames.add(allPlayerShotsLabel);
+        panelCurrentGames.add(new JLabel(""));
         panelCurrentGames.add(buttonEndGame);
+        panelCurrentGames.add(randomSetShips);
+
+        panelCurrentGames.setMinimumSize(new Dimension(200,400));
+        panelCurrentGames.setMaximumSize(new Dimension(200,700));
+        panelCurrentGames.setPreferredSize(new Dimension(200,400));
+
 
 
         // Создаем панель со стартовым интерфейсом - пока только кнопка "Начать игру"
+        panelStartGames.setLayout( new GridLayout(10,1,5,10));
+        panelStartGames.setBorder( BorderFactory.createEmptyBorder(10, 10, 10, 10) );
+        panelStartGames.setMinimumSize(new Dimension(200,400));
+        panelStartGames.setMaximumSize(new Dimension(200,700));
+        panelStartGames.setPreferredSize(new Dimension(200,400));
+
         panelStartGames.add(buttonStartGame);
+        panelStartGames.add(aboutAutor);
+        panelStartGames.add(new JLabel(""));
+        panelStartGames.add(countPlayerWinLabel);
+        panelStartGames.add(countEnemyWinLabel);
+
+        //panelStartGames.add(new JLabel(""));
+        //panelStartGames.add(new JLabel(""));
+
+
+        // Панель с информацией об игре
+        aboutBrownBox = new JButton();
+        aboutBrownBox.setBackground(new Color(102, 51 , 0));
+        aboutBrownBox.setPreferredSize(new Dimension(40,40));
+        aboutRedBox = new JButton();
+        aboutRedBox.setBackground(Color.pink);
+        aboutRedBox.setPreferredSize(new Dimension(40,40));
+        aboutBlueBox = new JButton();
+        aboutBlueBox.setBackground(new Color(51,204,255));
+        aboutBlueBox.setPreferredSize(new Dimension(40,40));
+
+        //panelAboutGame.setLayout( new GridLayout(5,1,5,10));
+        panelAboutGame.setLayout(new FlowLayout());
+        panelAboutGame.setBorder( BorderFactory.createEmptyBorder(10, 10, 10, 10) );
+        panelAboutGame.setMinimumSize(new Dimension(200,400));
+        panelAboutGame.setMaximumSize(new Dimension(200,700));
+        panelAboutGame.setPreferredSize(new Dimension(200,400));
+        panelAboutGame.add(aboutThisGameLabel);
+        panelAboutGame.add(aboutBrownBox);
+        JLabel aboutBox = new JLabel(" - ship");
+        aboutBox.setPreferredSize(new Dimension(100,20));
+        aboutBox.setForeground(Color.PINK);
+        panelAboutGame.add(aboutBox);
+        panelAboutGame.add(aboutRedBox);
+        aboutBox = new JLabel(" - die ship");
+        aboutBox.setForeground(Color.PINK);
+        aboutBox.setPreferredSize(new Dimension(100,20));
+        panelAboutGame.add(aboutBox);
+        panelAboutGame.add(aboutBlueBox);
+        aboutBox = new JLabel(" - empty");
+        aboutBox.setForeground(Color.PINK);
+        aboutBox.setPreferredSize(new Dimension(100,20));
+        panelAboutGame.add(aboutBox);
+
+        aboutBox = new JLabel("");
+        aboutBox.setPreferredSize(new Dimension(200,50));
+        panelAboutGame.add(aboutBox);
+        panelAboutGame.add(backOnStartMenu);
+        //panelAboutGame.add(new JLabel("hhhhh"));
+
+
+
+
+        aboutAutor.setMaximumSize(new Dimension(10,10));
+        aboutAutor.setMinimumSize(new Dimension(10,10));
+        aboutAutor.setPreferredSize(new Dimension(10,10));
+        aboutAutor.setSize(new Dimension(10,10));
+
+        countPlayerWinLabel.setText("Всего ваших побед: " + Integer.toString(countPlayerWin));
+        countEnemyWinLabel.setText("Всего побед соперника: " + Integer.toString(countEnemyWin));
 
 
         // Создаем среднее поле с настройками
@@ -96,7 +231,10 @@ public class gamesField extends JFrame{
         panelCenterGame.setLayout (new FlowLayout(FlowLayout.CENTER));
 
 
-        panelCenterGame.add(panelStartGames);
+        panelCenterGame.setBackground(new Color(255,255,153));
+        panelStartGames.setBackground(new Color(255,255,153));
+        panelCurrentGames.setBackground(new Color(255,255,153));
+        panelAboutGame.setBackground(new Color(102,100,153));
 
         //container.getLayout().
 
@@ -119,16 +257,29 @@ public class gamesField extends JFrame{
 
         buttonStartGame.addActionListener(new listenerGamesField() );
         buttonEndGame.addActionListener(new listenerGamesField() );
+        randomSetShips.addActionListener(new listenerGamesField() );
+        aboutAutor.addActionListener(new listenerGamesField() );
+        backOnStartMenu.addActionListener(new listenerGamesField() );
 
         buttonStartGame.setActionCommand("Start game");
         buttonEndGame.setActionCommand("End game");
+        randomSetShips.setActionCommand("randomSetShips");
+        aboutAutor.setActionCommand("aboutAutor");
+        backOnStartMenu.setActionCommand("backOnStartMenu");
+
+        panelCenterGame.add(panelStartGames);
+        panelCenterGame.add(panelCurrentGames);
+        panelCenterGame.add(panelAboutGame);
+        panelStartGames.setVisible(true);
+        panelCurrentGames.setVisible(false);
+        panelAboutGame.setVisible(false);
 
         //container.add(buttonoo);
     }
 
-    private void setRandomShipForEnemy() {
-        enemyField.clearField();
-        enemyField.setStateField(battleField.stateField.E_WAIT_SET_SHIP);
+    private void setRandomShipForField(battleField field) {
+        field.clearField();
+        field.setStateField(battleField.stateField.E_WAIT_SET_SHIP);
 
         ArrayList<Integer> listShipEnemy = new ArrayList<>();
         listShipEnemy.add(4);
@@ -156,7 +307,7 @@ public class gamesField extends JFrame{
                 }
 
                 boolean flagContinue = false;
-                if (enemyField.getStateBox(row[0], column[0]) == battleField.stateBox.E_SHIP ) {
+                if (field.getStateBox(row[0], column[0]) == battleField.stateBox.E_SHIP ) {
                     continue;
                 }
                 */
@@ -206,7 +357,7 @@ public class gamesField extends JFrame{
                                 continue;
                             }
 
-                            if (enemyField.getStateBox(row[i] + n, column[i] + m) == battleField.stateBox.E_SHIP ) {
+                            if (field.getStateBox(row[i] + n, column[i] + m) == battleField.stateBox.E_SHIP ) {
                                 flagContinue = true;
                             }
 
@@ -218,7 +369,7 @@ public class gamesField extends JFrame{
                 if(!flagContinue) {
                     for(int i = 0; i < nextShip; i++ ) {
                         //System.out.println(row[i] + " " + column[i]);
-                        enemyField.setShipInBox(row[i], column[i]);
+                        field.setShipInBox(row[i], column[i]);
                     }
                     //System.out.println();
 
@@ -234,20 +385,16 @@ public class gamesField extends JFrame{
             int row = (int)(Math.random()*10);
             int column = (int)(Math.random()*10);
 
-            enemyField.setShipInBox( row , column);
+            field.setShipInBox( row , column);
         }*/
 
 
-        enemyField.setStateField(battleField.stateField.E_DISABLE);
+        field.setStateField(battleField.stateField.E_DISABLE);
     }
 
     private void timerForMakeShot() {
         //timerForShot.schedule(timerTaskForShot, 1000);
         timerForShot.start();
-    }
-
-    private void startGame() {
-
     }
 
     private boolean checkAliveShipOnFields() {
@@ -266,20 +413,26 @@ public class gamesField extends JFrame{
     private void finishGame(battleField.typeField win) {
         if(win == battleField.typeField.E_PLAYER) {
             infoLabel.setText("Вы выйграли!");
+            countPlayerWin++;
         }
         else if(win == battleField.typeField.E_ENEMY){
             infoLabel.setText("Вы проиграли!");
+            countEnemyWin++;
         }
 
         enemyField.setStateField(battleField.stateField.E_DISABLE);
         myField.setStateField(battleField.stateField.E_DISABLE);
 
         buttonStartGame.setText("Start game");
+        TimerForTimeGame.stop();
+
+        countPlayerWinLabel.setText("Всего ваших побед: " + Integer.toString(countPlayerWin));
+        countEnemyWinLabel.setText("Всего побед соперника: " + Integer.toString(countEnemyWin));
 
     }
 
     private void makeShotForEnemy() {
-        myField.setStateField(battleField.stateField.E_WAIT_SHOT);
+        //myField.setStateField(battleField.stateField.E_WAIT_SHOT);
 
 
             int row = (int)(Math.random()*10);
@@ -288,7 +441,7 @@ public class gamesField extends JFrame{
             myField.setShotInBox( row , column);
 
 
-        myField.setStateField(battleField.stateField.E_DISABLE);
+        //myField.setStateField(battleField.stateField.E_DISABLE);
     }
 
     public void haveShot(battleField.typeField typeField) {
@@ -299,18 +452,48 @@ public class gamesField extends JFrame{
             enemyField.setStateField(battleField.stateField.E_WAIT_SHOT);
             myField.setStateField(battleField.stateField.E_DISABLE);
 
-            buttonStartGame.setText("Твой ход");
+            infoLabel.setText("Твой ход");
+            funnyFunction();
         }
         else if(typeField == battleField.typeField.E_ENEMY) {
             myField.setStateField(battleField.stateField.E_WAIT_SHOT);
             enemyField.setStateField(battleField.stateField.E_DISABLE);
 
-            buttonStartGame.setText("Ход прот");
+            infoLabel.setText("Ход противника...");
+            addInfoLabel.setText( "" );
+            allPlayerShots++;
+            allPlayerShotsLabel.setText( "Выстрелов:   " + Integer.toString(allPlayerShots));
 
             timerForMakeShot();
         }
 
     }
+
+    // Все корабли расставлены
+    public void haveAllShipsOnField(battleField.typeField typeField) {
+        if(typeField == battleField.typeField.E_PLAYER) {
+            letStartGame();
+        }
+        else if(typeField == battleField.typeField.E_ENEMY) {
+
+        }
+    }
+
+    private void letStartGame() {
+        randomSetShips.setVisible(false);
+        infoLabel.setText("Твой ход");
+
+    }
+
+    String[] funnyPhrases = {"- 'Заставь его страдать'", "- 'Бей бей бей'", "- 'мама...'"
+            ,"- 'Ну все'", "- 'Кончай с ним'", "- 'Взорви его корабли!'","- 'Давай уже'"
+            , "- 'Ты что застыл, сосунок?'", "- 'Покажи ему, кто тут Альфа!'", "- 'Kill him'" };
+
+    public void funnyFunction() {
+        int numPhrase = (int)(Math.random()* funnyPhrases.length);
+        addInfoLabel.setText( funnyPhrases[numPhrase] );
+    }
+
 
     class listenerGamesField implements ActionListener {
         @Override
@@ -329,22 +512,38 @@ public class gamesField extends JFrame{
                 addInfoLabel.setText(Integer.toString( listCreateShip.get(indexCreateShip) ) + " квадрат");
 
                 myField.setStateField(battleField.stateField.E_WAIT_SET_SHIP);
-                setRandomShipForEnemy();
+                setRandomShipForField();
                 */
-
+/*
                 panelCenterGame.removeAll();
-                panelCenterGame.add(panelCurrentGames);
+                panelCenterGame.add(panelCurrentGames);*/
+
+                panelStartGames.setVisible(false);
+                panelCurrentGames.setVisible(true);
+                panelAboutGame.setVisible(false);
 
                 //buttonStartGame.setText("put a ships");
                 infoLabel.setText("Поставь корабль: ");
                 addInfoLabel.setText(Integer.toString( listCreateShip.get(indexCreateShip) ) + " квадрат");
 
                 myField.setStateField(battleField.stateField.E_WAIT_SET_SHIP);
-                setRandomShipForEnemy();
+                setRandomShipForField(enemyField);
                 repaint();
+
+                enemyField.setStateField(battleField.stateField.E_WAIT_SHOT);
+                myField.setStateField(battleField.stateField.E_DISABLE);
+                //buttonStartGame.setText("Твой ход");
+
+
+                dateTimeStartGame = System.currentTimeMillis();
+                TimerForTimeGame.start();
+
+                //SimpleDateFormat formatForDateNow = new SimpleDateFormat("hh:mm:ss");
+                //currentTimeLabel.setText(formatForDateNow.format(dateCur));
             }
             else if( command == "TTT" )
             {
+                /*
                 indexCreateShip++;
                 if(indexCreateShip < listCreateShip.size() )
                 {
@@ -352,7 +551,7 @@ public class gamesField extends JFrame{
                     addInfoLabel.setText(Integer.toString( listCreateShip.get(indexCreateShip) ) + " квадрат");
 
                     return;
-                }
+                }*/
 
                 enemyField.setStateField(battleField.stateField.E_WAIT_SHOT);
                 myField.setStateField(battleField.stateField.E_DISABLE);
@@ -360,9 +559,57 @@ public class gamesField extends JFrame{
             }
             else if( command == "End game"  )
             {
-                panelCenterGame.removeAll();
-                panelCenterGame.add(panelStartGames);
+                enemyField.setStateField(battleField.stateField.E_DISABLE);
+                myField.setStateField(battleField.stateField.E_DISABLE);
+
+                /*panelCenterGame.removeAll();
+                panelCenterGame.add(panelStartGames);*/
+
+                panelStartGames.setVisible(true);
+                panelCurrentGames.setVisible(false);
+                panelAboutGame.setVisible(false);
+
+                allPlayerShots = 0;
+                allPlayerShotsLabel.setText("");
+
+                myField.clearField();
+                enemyField.clearField();
+
+                randomSetShips.setVisible(true);
+
+                TimerForTimeGame.stop();
+
                 repaint();
+            }
+            else if( command == "randomSetShips") {
+                setRandomShipForField(myField);
+                randomSetShips.setVisible(false);
+            }
+            else if( command == "aboutAutor") {
+                /*panelCenterGame.removeAll();
+                panelCenterGame.add(panelAboutGame);
+                //panelCenterGame.add(panelCurrentGames);
+                repaint();*/
+
+                panelStartGames.setVisible(false);
+                panelCurrentGames.setVisible(false);
+                panelAboutGame.setVisible(true);
+
+
+            }
+            else if( command == "backOnStartMenu") {
+                /*
+                panelCenterGame.removeAll();
+                //panelCenterGame.add(panelStartGames);
+                panelCenterGame.add(panelCurrentGames);
+                repaint();
+                */
+                /*panelCenterGame.removeAll();
+                panelCenterGame.add(panelCurrentGames);*/
+
+                panelStartGames.setVisible(true);
+                panelCurrentGames.setVisible(false);
+                panelAboutGame.setVisible(false);
             }
 
 

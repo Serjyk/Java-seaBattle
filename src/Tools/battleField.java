@@ -33,6 +33,9 @@ public class battleField extends JPanel{
         E_DISABLE
     }
 
+    Color colorPlayer = new Color(102,255,102);
+    Color colorEnemy = new Color(255,102,102);
+
     private typeField typeThisField = typeField.E_ENEMY;
     private stateField stateThisField = stateField.E_ENABLE;
 
@@ -104,6 +107,8 @@ public class battleField extends JPanel{
 
     public void initField()
     {
+        setBackground(new Color(255,255,204));
+
         for(int i = 0; i < 10; i++) {
             for (int j = 0; j < 10; j++) {
                 battleMatrix[i][j] = stateBox.E_EMPTY;
@@ -133,8 +138,14 @@ public class battleField extends JPanel{
         this.add(panelBoxes);
 
         JLabel firstBoxText = new JLabel("");
+/*
+        firstBoxText.setOpaque(true);
+        firstBoxText.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+        panelBoxes.add( firstBoxText );*/
+
+
         JPanel firstBox = new JPanel();
-        firstBox.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+        firstBox.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
         firstBox.add(firstBoxText);
 
         panelBoxes.add( firstBox );
@@ -144,10 +155,17 @@ public class battleField extends JPanel{
         for (int i = 0; i < 10; i++)
         {
             JLabel labelLett = new JLabel(Character.toString(headTop.charAt(i)));
-            //labelLett.setForeground( typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+/*
+            labelLett.setOpaque(true);
+            labelLett.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+
+            panelBoxes.add( labelLett );*/
+
+            //labelLett.setForeground( typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+
 
             JPanel titlePanel = new JPanel();
-            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
             titlePanel.add(labelLett);
 
             panelBoxes.add( titlePanel );
@@ -155,10 +173,13 @@ public class battleField extends JPanel{
 
         for(int i = 0; i < 10; i++) {
             JLabel labelNum = new JLabel(Integer.toString( i + 1));
-            //labelNum.setForeground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+            //labelNum.setForeground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+            /*labelNum.setOpaque(true);
+            labelNum.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+            panelBoxes.add( labelNum );*/
 
             JPanel titlePanel = new JPanel();
-            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? Color.green : Color.red);
+            titlePanel.setBackground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
             titlePanel.add(labelNum);
 
             panelBoxes.add( titlePanel );
@@ -187,22 +208,35 @@ public class battleField extends JPanel{
         constraints.weightx = 0.5;
         constraints.gridy   = 0  ;  // нулевая ячейка таблицы по вертикали
 
+        int sizeForText = 14;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;      // нулевая ячейка таблицы по горизонтали
+        labelNameField.setForeground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+        labelNameField.setFont(new Font("Serif", Font.BOLD, sizeForText));
         add(labelNameField, constraints);
 
+        /*
         JLabel labeltest1 = new JLabel("Тестовое");
-        //labeltest1.setForeground( Color.green );
-        //labeltest1.setBackground( Color.green );
+        labeltest1.setFont(new Font("Serif", Font.BOLD, sizeForText));
+        //labeltest1.setOpaque(true);
+        //labeltest1.setBackground(Color.pink);
+        labeltest1.setForeground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
+
+
+        //labeltest1.setForeground( colorPlayer );
+        //labeltest1.setBackground( colorPlayer );
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 1;      // первая ячейка таблицы по горизонтали
         add(labeltest1, constraints);
 
         JLabel labeltest2 = new JLabel("Количество ходов");
+        labeltest2.setFont(new Font("Serif", Font.BOLD, sizeForText));
+        labeltest2.setForeground(typeThisField == typeField.E_PLAYER ? colorPlayer : colorEnemy);
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 2;      // вторая ячейка таблицы по горизонтали
         add(labeltest2, constraints);
+        */
 
         constraints.fill = GridBagConstraints.HORIZONTAL;
         //constraints.ipady     = 45;   // кнопка высокая
@@ -226,9 +260,9 @@ public class battleField extends JPanel{
                     Color colorBut = Color.lightGray;
                     switch (battleMatrix[i][j]) {
                         case E_EMPTY: colorBut = Color.lightGray ; break;
-                        case E_CHECKED_EMPTY: colorBut = Color.blue ; break;
-                        //case E_SHIP: colorBut = Color.lightGray ; break;
-                        case E_SHIP: colorBut = Color.black ; break;
+                        case E_CHECKED_EMPTY: colorBut = new Color(51,204,255) ; break;
+                        case E_SHIP: colorBut = Color.lightGray ; break;
+                        //case E_SHIP: colorBut = Color.black ; break; // для отработки
                         case E_DESTROYED_SHIP: colorBut = Color.pink ; break;
                     }
                     //buttonsMatrix[i][j].setText(nameBox);
@@ -245,8 +279,8 @@ public class battleField extends JPanel{
                     Color colorBut = Color.lightGray;
                     switch (battleMatrix[i][j]) {
                         case E_EMPTY: colorBut = Color.lightGray ; break;
-                        case E_CHECKED_EMPTY: colorBut = Color.blue ; break;
-                        case E_SHIP: colorBut = Color.black ; break;
+                        case E_CHECKED_EMPTY: colorBut = new Color(51,204,255) ; break;
+                        case E_SHIP: colorBut =  new Color(102, 51 , 0) ; break;
                         case E_DESTROYED_SHIP: colorBut = Color.pink ; break;
                     }
                     //buttonsMatrix[i][j].setText(nameBox);
@@ -271,6 +305,10 @@ public class battleField extends JPanel{
         battleMatrix[row][column] = stateBox.E_SHIP;
         updateStateField();
         getCountAliveShip++;
+
+        if(getCountAliveShip == (1*4 + 2*3 + 3*2 + 4*1)){
+            myparent.haveAllShipsOnField(typeThisField);
+        }
     }
 
     public stateBox getStateBox(int row, int column) {
